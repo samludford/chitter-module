@@ -1,12 +1,15 @@
 
-const int ledPin = 1;
+const int ledPin = 3;
+const int potPin = A2;
 const int MAX_STEPS = 16;
 const int MIN_STEPS = 3;
 const int MIN_BEATS = 1;
 
+int potVal = 0;
+
 int ledState = LOW;
 long previousMillis = 0;
-int interval = 100;
+int interval = 40;
 int blinkTime = 30;
 
 int playhead = 0;
@@ -24,8 +27,9 @@ int slots;
 
 void setup() {                
   pinMode(ledPin, OUTPUT);
-  randomSeed(analogRead(2));
-  randomisePattern();
+  pinMode(potPin, INPUT);
+//  randomSeed(analogRead(4));
+//  randomisePattern();
 }
 
 void randomisePattern() {
@@ -36,6 +40,10 @@ void randomisePattern() {
 
 void loop() {
 
+  potVal = analogRead(potPin);
+
+  interval = map(potVal,0,1023,10,200);
+
   unsigned long currentMillis = millis();
   
   if(ledState == LOW) {
@@ -45,6 +53,10 @@ void loop() {
       // this modulo operation is performed at the beginning to account for changes in pattern where the new
       // pattern is shorter than the current playhead position
       playhead = playhead % slots;
+
+      if(playhead == 0) {
+        randomisePattern();
+      }
 
       previousMillis = currentMillis;
 
