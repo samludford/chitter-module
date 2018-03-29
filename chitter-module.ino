@@ -1,3 +1,45 @@
+// Name: Sam Ludford
+
+// Course: Physical Computing
+
+// Assignment: Term 2 Final Project
+
+
+
+// Project Title: Chitter
+
+
+
+// References 
+
+// 1: http://cgm.cs.mcgill.ca/~godfried/publications/banff.pdf
+
+// Paper by Godfried Touissant describing the concepts behind Euclidean rhythms.
+
+// 3: https://ics-web.sns.ornl.gov/timing/Rep-Rate%20Tech%20Note.pdf
+
+// E. Bjorklund's paper describing the algorithm which is used to generate Euclidean rhythms
+
+// 2: https://github.com/samludford/bjorklund
+
+// A Processing implementation of Bjorklund's algorithm I wrote previously, used as a starting point.
+
+// 3: https://bitbucket.org/sjcastroe/bjorklunds-algorithm
+
+// A C++ implementation of Bjorklund's algorithm, used as reference.
+
+// 4: https://hackingmajenkoblog.wordpress.com/2016/02/04/the-evils-of-arduino-strings/
+
+// A post describing the dangers of using strings in Arduino - convinced me to use fixed length arrays instead.
+
+// 5: https://forum.arduino.cc/index.php?topic=64616.0
+
+// A thread on the Arduino forum discussing implementations of Euclidean rhythms.
+
+// 6: http://doc.gold.ac.uk/compartsblog/index.php/work/autoreong/
+
+// My previous project using solenoids. All solenoid and clock relate code was based on code I developed then.
+
 
 const int ledPin = 3;
 const int potPin = A2;
@@ -23,26 +65,28 @@ int pauses;
 int patit=0;
 char pattern[MAX_STEPS];
 int slots;
+int repeat;
+int repeatCount;
 
 
 void setup() {                
   pinMode(ledPin, OUTPUT);
   pinMode(potPin, INPUT);
-//  randomSeed(analogRead(4));
-//  randomisePattern();
 }
 
 void randomisePattern() {
   slots = random(MIN_STEPS, MAX_STEPS);
   int beats = random(MIN_BEATS, slots);
   compute_bitmap(slots, beats);
+  repeat = random(1, 12);
+  repeatCount = 0;
 }
 
 void loop() {
 
   potVal = analogRead(potPin);
 
-  interval = map(potVal,0,1023,10,200);
+  interval = map(potVal,0,1023,100,200);
 
   unsigned long currentMillis = millis();
   
@@ -55,7 +99,12 @@ void loop() {
       playhead = playhead % slots;
 
       if(playhead == 0) {
-        randomisePattern();
+        if(repeatCount >= repeat) {
+          randomisePattern();  
+        } else {
+          repeatCount++;  
+        }
+        
       }
 
       previousMillis = currentMillis;
